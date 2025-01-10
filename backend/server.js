@@ -25,10 +25,10 @@ app.post("/add", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const user = new User({ username: username, email: email, password: hashedPassword });
-        // const isExists = await User.findOne({ email: email });
-        // if (isExists) {
-        //     return res.status(404).json({ message: "User already exists...." });
-        // }
+        const isExists = await User.findOne({ email: email });
+        if (isExists) {
+            return res.status(404).json({ message: "User already exists...." });
+        }
         await user.save();
         return res.status(201).json({ message: "User added successfully...." });
     }
@@ -125,6 +125,20 @@ app.get("/users/paginate", async (req, res) => {
     }
     catch (error) {
         return res.status(404).json({ message: "Error in Paginating...", error: error.message });
+    }
+});
+
+//Update multiple user
+app.post("/updateMultiple", async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        const salt = await bcrypt.genSalt(10);
+        const hashP = await bcrypt.hash(newPassword, salt);
+        await User.updateMany({ email: { $in: email } }, { $set: { password: hashP } });
+        return res.status(200).json({ message: "Multiple Users updated successfully...." });
+    }
+    catch (error) {
+        return res.status(404).json({ message: "Error in updating multiple users..." });
     }
 });
 
