@@ -18,6 +18,7 @@ mongoose.connect(mongodb_url)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//Add single user Route
 app.post("/add", async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -36,6 +37,7 @@ app.post("/add", async (req, res) => {
     }
 });
 
+//Delete single user Route
 app.post("/removeByID/:id", async (req, res) => {
     try {
         const email = req.params.id;
@@ -51,6 +53,7 @@ app.post("/removeByID/:id", async (req, res) => {
     }
 });
 
+//Update the single user Route
 app.post("/update/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -71,6 +74,7 @@ app.post("/update/:id", async (req, res) => {
     }
 });
 
+//Delete single user Route
 app.post("/delete/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -86,6 +90,7 @@ app.post("/delete/:id", async (req, res) => {
     }
 });
 
+//Delete multiple user with similarities Route
 app.post("/deleteMany/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -97,6 +102,7 @@ app.post("/deleteMany/:id", async (req, res) => {
     }
 });
 
+//Find all users Route
 app.get("/allUsers", async (req, res) => {
     try {
         const users = await User.find();
@@ -110,14 +116,17 @@ app.get("/allUsers", async (req, res) => {
     }
 });
 
+//Pagination Route
 app.get("/users/paginate", async (req, res) => {
     try {
-
+        const { page = 1, limit = 10 } = req.query;
+        const users = await User.find().skip((page - 1) * limit).limit(parseInt(limit));
+        return res.status(200).json({ page, limit, users });
     }
     catch (error) {
         return res.status(404).json({ message: "Error in Paginating...", error: error.message });
     }
-})
+});
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running at port number ${PORT}`)
