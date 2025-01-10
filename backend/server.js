@@ -115,7 +115,7 @@ app.get("/users/paginate", async (req, res) => {
 
     }
     catch (error) {
-        
+        return res.status(404).json({ message: "Error in Paginating...", error: error.message });
     }
 })
 
